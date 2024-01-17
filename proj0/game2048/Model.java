@@ -138,7 +138,19 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for(int col=0; col<size; col++)
+        {
+            for(int row=0; row<size; row++)
+            {
+                if(b.tile(col,row) == null)
+                {
+                    return true;
+                }
+            }
+        }
         return false;
+        // TODO: DONE
     }
 
     /**
@@ -148,17 +160,61 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for(int col=0; col<size; col++)
+        {
+            for(int row=0; row<size; row++)
+            {
+                if(b.tile(col,row) != null)
+                {
+                    int tileVal = b.tile(col,row).value();
+                    if(tileVal == MAX_PIECE) return true;
+                }
+            }
+        }
         return false;
+        // TODO: Done
     }
-
     /**
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
      * 1. There is at least one empty space on the board.
      * 2. There are two adjacent tiles with the same value.
      */
+    private static boolean validCoordinates(int col,int row,int size)
+    {
+        return(col < size && row < size && row >= 0 && col >=0);
+    }
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if(emptySpaceExists(b)) {
+            // 1- check if there is at least one empty space on the board
+            return true;
+        }
+        else {
+            // 2- if There are two adjacent tiles with the same value.
+            int size = b.size();
+            for(int col = 0; col<size; col++)
+            {
+                for(int row = 0; row<size; row++)
+                {
+                    int currTileValue = b.tile(row,col).value();
+                    int[] dx = {1, 0, -1, 0};
+                    int[] dy = {0, 1, 0, -1};
+                    for(int i=0; i<4; i++)
+                    {
+                        int nx = col+dx[i];
+                        int ny = row+dy[i];
+                        if(validCoordinates(nx,ny,size))
+                        {
+                            int neighbourTileValue = b.tile(nx,ny).value();
+                            if(neighbourTileValue == currTileValue) return true;
+                        }
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
