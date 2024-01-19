@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author TODO: Ahmed Ehab Qamar
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -24,6 +24,16 @@ public class Model extends Observable {
 
     /** Largest piece value. */
     public static final int MAX_PIECE = 2048;
+
+    /* Array to check if the current Coordinate is edited. */
+    boolean[][] edited = new boolean[4][4];
+
+    public void setEditedToFalse() {
+        for(int i=0; i<4; i++)
+        {
+            for(int j=0; j<4; j++) edited[i][j] = false;
+        }
+    }
 
     /** A new 2048 game on a board of size SIZE with no pieces
      *  and score 0. */
@@ -113,11 +123,52 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
+        for(int col=3; col>=0; col--)
+        {
+            for(int row=3; row>=0; row--)
+            {
+                int localScore = 0;
+                Tile t = tile(col,row);
+                boolean localChange = false;
+                int currRow = row;
+                if(tile(col,row) != null)
+                {
+                    while(currRow+1 <4 && tile(col,currRow+1) == null)
+                    {
+                        localChange = true;
+                        currRow++;
+                        changed = true;
+                    }
+                    if(currRow+1 < 4 && tile(col,currRow+1) != null && !edited[col][currRow+1])
+                    {
 
+                        if(tile(col,currRow+1).value() == tile(col,row).value() )
+                        {
+                            localChange = true;
+                            currRow++;
+                            edited[col][currRow] = true;
+                            changed = true;
+                            localScore+=2*tile(col,row).value();
+                        }
+
+                    }
+                }
+                if(localChange)
+                {
+                    board.move(col,currRow,t);
+                }
+                score+=localScore;
+
+            }
+
+        }
         checkGameOver();
         if (changed) {
             setChanged();
         }
+        setEditedToFalse();
+        board.setViewingPerspective(Side.NORTH);
         return changed;
     }
 
@@ -214,7 +265,6 @@ public class Model extends Observable {
                 }
             }
         }
-
         return false;
     }
 
